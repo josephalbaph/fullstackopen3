@@ -31,9 +31,7 @@ let persons = [
   },
 ];
 
-app.get("/", (request, response) => {
-  response.send("<h1>Hello World!</h1>");
-});
+app.use(express.static("build"));
 
 app.get("/info", (request, response) => {
   response.send(
