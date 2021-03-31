@@ -1,0 +1,3 @@
+# DELETE http://josephalbaph.tk:3001/api/persons/1
+
+GET http://josephalbaph.tk:3001/api/persons
