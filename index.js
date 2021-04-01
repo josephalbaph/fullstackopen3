@@ -1,4 +1,6 @@
 require("dotenv").config();
+const mongoose = require("mongoose");
+
 const express = require("express");
 const app = express();
 const cors = require("cors");
@@ -116,7 +118,25 @@ app.use(unknownEndpoint);
 // handler of requests with result to errors
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+const url = process.env.MONGODB_URI;
+
+console.log("connecting to", url);
+
+mongoose
+  .connect(url, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+    useCreateIndex: true,
+  })
+  .then((result) => {
+    console.log("connected to MongoDB");
+    // listen to port only when connected to MongoDB
+    const PORT = process.env.PORT || 3001;
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.log("error connecting to MongoDB:", error.message);
+  });
