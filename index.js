@@ -15,8 +15,8 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === "CastError") {
     return response.status(400).send({ error: "malformatted id" });
-  }
-
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
   next(error);
 };
 
@@ -30,10 +30,10 @@ const requestLogger = (request, response, next) => {
 
 app.use(requestLogger);
 
-app.get("/api/persons", (request, response) => {
+app.get("/api/persons", (request, response, ndex) => {
   Person.find({}).then((persons) => {
     response.json(persons);
-  });
+  }).catch(error => next(error));
 });
 
 app.get("/api/persons/:id", (request, response, next) => {
@@ -45,10 +45,8 @@ app.get("/api/persons/:id", (request, response, next) => {
         response.status(404).end();
       }
     })
-    .catch((error) => {
-      console.log("What is this");
-      next(error);
-    });
+    .catch((error) => next(error);
+    );
 });
 
 app.delete("/api/persons/:id", (request, response, next) => {
@@ -94,16 +92,16 @@ app.post("/api/persons", (request, response, next) => {
         number: body.number,
       });
       person.save().then((savedPerson) => {
-        return response.json(savedPerson);
-      });
+        response.json(savedPerson);
+      }).catch(error => next(error));
     } else {
       const person = result[0];
       person.number = body.number;
       Person.findByIdAndUpdate(person._id, person, { new: true }).then(
         (updatedPerson) => {
-          return response.json(updatedPerson);
+          response.json(updatedPerson);
         }
-      );
+      ).catch(error => next(error));
     }
   });
 });
@@ -120,7 +118,7 @@ app.use(errorHandler);
 
 const url = process.env.MONGODB_URI;
 
-console.log("connecting to", url);
+// console.log("connecting to", url);
 
 mongoose
   .connect(url, {
