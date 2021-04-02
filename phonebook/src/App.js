@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from "react";
-import "./App.css";
-import personService from "./services/persons";
+import React, { useState, useEffect } from 'react'
+import './App.css'
+import personService from './services/persons'
 
 const Notification = ({ message }) =>
-  message ? <div className="notification">{message}</div> : null;
+  message ? <div className='notification'>{message}</div> : null
 const ErrorMessage = ({ errorMessage }) =>
-  errorMessage ? <div className="error">{errorMessage}</div> : null;
+  errorMessage ? <div className='error'>{errorMessage}</div> : null
 
 const Filter = ({ value, onChange }) => (
   <div>
     filter shown with <input value={value} onChange={onChange} />
   </div>
-);
+)
 
 const PersonForm = ({
   name,
@@ -28,10 +28,10 @@ const PersonForm = ({
       number: <input value={number} onChange={onChangeNumber} />
     </div>
     <div>
-      <button type="submit">add</button>
+      <button type='submit'>add</button>
     </div>
   </form>
-);
+)
 
 const Persons = ({ personsToShow, deletePerson }) => {
   return (
@@ -43,129 +43,130 @@ const Persons = ({ personsToShow, deletePerson }) => {
         </div>
       ))}
     </div>
-  );
-};
+  )
+}
 
 const App = () => {
-  const [persons, setPersons] = useState([]);
-  const [message, setMessage] = useState();
-  const [errorMessage, setErrorMessage] = useState();
-  const [newName, setNewName] = useState("");
-  const [newNumber, setNewNumber] = useState("");
-  const [newFilter, setNewFilter] = useState("");
+  const [persons, setPersons] = useState([])
+  const [message, setMessage] = useState()
+  const [errorMessage, setErrorMessage] = useState()
+  const [newName, setNewName] = useState('')
+  const [newNumber, setNewNumber] = useState('')
+  const [newFilter, setNewFilter] = useState('')
 
   const addPerson = (event) => {
-    event.preventDefault();
-    const changedPerson = persons.find((p) => p.name === newName);
+    event.preventDefault()
+    const changedPerson = persons.find((p) => p.name === newName)
     if (changedPerson) {
       if (
         window.confirm(
           `${changedPerson.name} is already added to phonebook, replace the old number with a new one? `
         )
       ) {
-        changedPerson.number = newNumber;
+        changedPerson.number = newNumber
         personService
           .update(changedPerson.id, changedPerson)
           .then((returnedPerson) => {
-            setMessage(`Updated ${changedPerson.name}.`);
+            setMessage(`Updated ${changedPerson.name}.`)
             setTimeout(() => {
-              setMessage(null);
-            }, 5000);
+              setMessage(null)
+            }, 5000)
 
             setPersons(
               persons.map((person) =>
                 person.id !== returnedPerson.id ? person : returnedPerson
               )
-            );
-            setNewName("");
-            setNewNumber("");
+            )
+            setNewName('')
+            setNewNumber('')
           })
           .catch((error) => {
-            // const errMsg = `Information of ${changedPerson.name} has been removed from server`;
-            const errMsg = error.response.data;
-            console.log(errMsg);
-            setErrorMessage(errMsg);
+            // const errMsg = `Information of ${changedPerson.name} has been removed from server`
+            const errMsg = error.response.data
+            console.log(errMsg)
+            setErrorMessage(errMsg)
             setTimeout(() => {
-              setErrorMessage(null);
-            }, 5000);
-          });
+              setErrorMessage(null)
+            }, 5000)
+          })
       }
     } else {
       const personObject = {
         name: newName,
         number: newNumber,
-      };
+      }
       personService
         .create(personObject)
         .then((returnedPerson) => {
-          setMessage(`Added ${returnedPerson.name}.`);
+          setMessage(`Added ${returnedPerson.name}.`)
           setTimeout(() => {
-            setMessage(null);
-          }, 5000);
-          setPersons(persons.concat(returnedPerson));
-          setNewName("");
-          setNewNumber("");
+            setMessage(null)
+          }, 5000)
+          setPersons(persons.concat(returnedPerson))
+          setNewName('')
+          setNewNumber('')
         })
         .catch((error) => {
-          const errMsg = error.response.data.error;
-          console.log(errMsg);
-          setErrorMessage(errMsg);
+          const errMsg = error.response.data.error
+          console.log(errMsg)
+          setErrorMessage(errMsg)
           setTimeout(() => {
-            setErrorMessage(null);
-          }, 5000);
-        });
+            setErrorMessage(null)
+          }, 5000)
+        })
     }
-  };
+  }
 
   const deletePerson = (personObject) => {
-    if (window.confirm("Delete " + personObject.name + "?")) {
+    if (window.confirm('Delete ' + personObject.name + '?')) {
       personService
         .del(personObject.id)
+        // eslint-disable-next-line no-unused-vars
         .then((returnedPerson) => {
-          setMessage(`Deleted ${personObject.name}.`);
+          setMessage(`Deleted ${personObject.name}.`)
           setTimeout(() => {
-            setMessage(null);
-          }, 5000);
+            setMessage(null)
+          }, 5000)
 
-          setPersons(persons.filter((person) => person.id !== personObject.id));
+          setPersons(persons.filter((person) => person.id !== personObject.id))
         })
         .catch((error) => {
-//          const errMsg = `Error in deleting ${personObject.name}`;
-          const errMsg = error.response.data;
-          console.log(errMsg);
-          setErrorMessage(errMsg);
+          //          const errMsg = `Error in deleting ${personObject.name}`
+          const errMsg = error.response.data
+          console.log(errMsg)
+          setErrorMessage(errMsg)
           setTimeout(() => {
-            setErrorMessage(null);
-          }, 5000);
-        });
+            setErrorMessage(null)
+          }, 5000)
+        })
     }
-  };
+  }
 
   const handleNameChange = (event) => {
-    setNewName(event.target.value);
-  };
+    setNewName(event.target.value)
+  }
 
   const handleNumberChange = (event) => {
-    setNewNumber(event.target.value);
-  };
+    setNewNumber(event.target.value)
+  }
 
   const handleFilterChange = (event) => {
-    setNewFilter(event.target.value);
-  };
+    setNewFilter(event.target.value)
+  }
 
   const personsToShow = newFilter
     ? persons.filter((person) =>
-        person.name.toLowerCase().includes(newFilter.toLowerCase())
-      )
-    : persons;
+      person.name.toLowerCase().includes(newFilter.toLowerCase())
+    )
+    : persons
 
   const hookPersons = () => {
     personService.getAll().then((initialPersons) => {
-      setPersons(initialPersons);
-    });
-  };
+      setPersons(initialPersons)
+    })
+  }
 
-  useEffect(hookPersons, []);
+  useEffect(hookPersons, [])
 
   return (
     <div>
@@ -184,7 +185,7 @@ const App = () => {
       <h2>Numbers</h2>
       <Persons personsToShow={personsToShow} deletePerson={deletePerson} />
     </div>
-  );
-};
+  )
+}
 
-export default App;
+export default App
